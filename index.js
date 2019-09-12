@@ -2,13 +2,20 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const passport = require('passport');
 const mongoose = require('mongoose');
 
 const app = express();
 
 
-//Load Router
+//Load idea Router
 const ideas = require('./routes/ideas');
+
+//Load User Router
+const user = require('./routes/user');
+
+//Load passport config
+require('./config/passport')(passport);
 
 //mongoose connection
 mongoose.Promise = global.Promise;
@@ -28,9 +35,15 @@ app.set('view engine','handlebars');
 //Method override middel ware
 app.use(methodOverride('_method'));
 
+
+
 //Body parser middle ware
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 
 
@@ -40,7 +53,10 @@ app.get('/',(req,res)=>{
 });
 
 //use router
-app.use('/ideas',ideas)
+app.use('/ideas',ideas);
+
+//Use user route
+app.use('/user',user);
 
 
 
